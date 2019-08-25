@@ -34,7 +34,11 @@ def get_uuid():
     '''
     url = config.api_endpoint + '/domains/' + config.domain
     u = requests.get(url, headers={"X-Api-Key":config.api_secret})
-    json_object = json.loads(u._content)
+    try:
+        json_object = json.loads(u._content)
+    except ValueError:
+        print 'Value error : exit'
+        exit()
     if u.status_code == 200:
         return json_object['zone_uuid']
     else:
@@ -60,7 +64,6 @@ def get_dnsip(uuid):
         return json_object['rrset_values'][0].encode('ascii','ignore').strip('\n')
     else:
         print 'Error: HTTP Status Code ', u.status_code, 'when trying to get IP from subdomain', config.subdomains[0]   
-        print  json_object['message']
         exit()
 
 def update_records(uuid, dynIP, subdomain):
